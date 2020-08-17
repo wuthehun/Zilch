@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta 
+			name="viewport" 
+			content="width=device-width,initial-scale-1.0"
+		>
+		<meta
+			http-equiv="X-UA-Compatible"
+			content="ie=edge"
+		>
+		<title>Chat Site</title>
+		<script defer src="http://localhost:3000/socket.io/socket.io.js"></script>
+		<script defer src="script.js"></script>
+		<style>
+			body {
+				padding: 10px;
+				margin: 0;
+				justify-content: center;
+			}
+
+			#message-container {
+				width: 80%;
+				max-width: 1200px;
+				height: 40vh;
+				max-height: 40vh;
+				overflow: auto;
+				overflow-y: scroll;
+				border-width: 1px;
+				border-color: black;
+				border:outset;
+			}
+
+			.inner-div {
+				background-color: #CCC;
+				padding: 5px;
+			}
+
+			.inner-div:nth-child(2n) {
+				background-color: #FFF;
+			}
+
+			#send-container {
+				padding-bottom: 30px;
+				bottom: 0;
+				background-color: white;
+				max-width: 1200px;
+				width: 80%;
+			}
+
+			#message-input {
+				flex-grow: 1;
+			}
+
+			.label-dice {
+				font-size: xx-large;
+			}
+			.label-score {
+				font-size: large;
+				font-weight: bold;
+			}
+
+		</style>
+			
+	</head>
+	<body>
+		<div id="message-container"></div>
+		<br />
+		<form id="send-container">
+			<div id="dice-area">
+				<h1><label id="lblPlayer"></label></h1>
+				<table class="dice">
+					<tr>
+						<td>
+							<label >Bank</label>
+							<br />
+							<label class="label-score" id="lblBankScore">0</label>
+						</td>
+						<td>
+							<label >Current Score</label>
+							<br />
+							<label class="label-score" id="lblCurrScore">0</label>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<label id="lblDice1" class="label-dice"></label>
+							<br />
+							<input type="checkbox" id="chkDice1" />
+							<label >Lock dice 1</label>
+						</td>
+						<td>
+							<label id="lblDice2" class="label-dice"></label>
+							<br />
+							<input type="checkbox" id="chkDice2" />
+							<label >Lock dice 2</label>
+						</td>
+						<td>
+							<label id="lblDice3" class="label-dice"></label>
+							<br />
+							<input type="checkbox" id="chkDice3" />
+							<label >Lock dice 3</label>
+						</td>
+						<td>
+							<label id="lblDice4" class="label-dice"></label>
+							<br />
+							<input type="checkbox" id="chkDice4" />
+							<label >Lock dice 4</label>
+						</td>
+						<td>
+							<label id="lblDice5" class="label-dice"></label>
+							<br />
+							<input type="checkbox" id="chkDice5" /> 
+							<label >Lock dice 5</label>
+						</td>
+						<td>
+							<label id="lblDice6" class="label-dice"></label>
+							<br />
+							<input type="checkbox" id="chkDice6" />
+							<label >Lock dice 6</label>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="button" id="btnRoll" onclick="roll()" value="ROLL"></input>
+							<input type="button" id="btnBank" onclick="bankScore()" value="BANK"></input>
+							<br />
+							<input type="button" id="btnReset" onclick="resetGame()" value="RESET GAME" hidden="true"></input>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<br />
+			<br />
+			<label>Chat</label>
+			<br />
+			<br />
+			<input type="text" id="message-input">
+			<button 
+				type="submit" 
+				id="send-button"
+			>
+				Send
+			</button>
+		</form>
+	</body>	
+</html>

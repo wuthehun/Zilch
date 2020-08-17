@@ -1,0 +1,22 @@
+{
+	"name": "zilch",
+	"version": "1.0.0",
+	"description": "Zilch game",
+	"main": "dist/app.js",
+	"scripts": {
+		"build": "tsc",
+		"start": "tsc && node dist/app.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"@types/express": "^4.17.7",
+		"tslint": "^6.1.2",
+		"typescript": "^3.9.7"
+	},
+	"dependencies": {
+		"express": "^4.17.1",
+		"socket.io": "^2.3.0"
+	}
+}
