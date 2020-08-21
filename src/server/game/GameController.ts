@@ -89,7 +89,7 @@ class GameController {
 
 		this.gameState.currPlayerIndex = nextPlayerIndex;
 		this.getCurrentPlayer().currentScore = 0;
-		this.getCurrentPlayer().currTurn = this.startTurn();
+		this.getCurrentPlayer().currTurn = this.getNewTurn();
 
 		if (this.gameState.isLastRound) {
 			if (this.getCurrentPlayer().playerID === this.gameState.lastRoundPlayerID) {
@@ -125,7 +125,7 @@ class GameController {
 		}
 	}
 
-	public startTurn(): TurnModel {
+	public getNewTurn(): TurnModel {
 		let newTurn: TurnModel = new TurnModel();
 		newTurn.dices = [];
 
@@ -134,6 +134,16 @@ class GameController {
 		}
 
 		return newTurn;
+	}
+
+	public isFirstRoll(pTurn: TurnModel): boolean {
+		for (let dice of pTurn.dices) {
+			if (dice.value === 0) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public rollDice(poTurn:TurnModel):ScoreModel[] {
@@ -242,6 +252,37 @@ class GameController {
 		}
 
 		return false;
+	}
+
+	public setupPlayer(pName: string, pSocketID: string) {
+		let newPlayer: PlayerModel = null;
+		for (let player of this.getPlayers()) {
+			if (player.playerName.toUpperCase() === pName.toUpperCase()) {
+				newPlayer = player;
+			}
+		}
+
+		if (newPlayer == null) {
+			newPlayer = new PlayerModel();
+			newPlayer.bankScore = 0;
+			newPlayer.currentScore = 0;
+			newPlayer.playerName = pName;
+
+			newPlayer.currTurn = this.getNewTurn();
+
+			this.addPlayer(newPlayer);
+		}
+
+		newPlayer.playerID = pSocketID;
+	}
+
+	public applyPlayerLocks(pLocks: boolean[], pTurn: TurnModel) {
+		for (let index = 0; index < 6; index++) {
+			if (pLocks[index]) {
+				pTurn.dices[index].isLocked = true;
+			}
+		}
+	
 	}
 }
 

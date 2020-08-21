@@ -139,12 +139,7 @@ function roll() {
 		return;
 	}
 
-	if (hasLocked) {
-		socket.emit('reroll', dataIsLocked)
-	} 
-	else {
-		socket.emit('roll', 'roll')
-	}
+	socket.emit('roll', dataIsLocked)
 
 }
 
