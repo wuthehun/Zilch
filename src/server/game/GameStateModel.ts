@@ -2,9 +2,9 @@ import PlayerModel from "./PlayerModel";
 
 class GameStateModel {
 	public players: PlayerModel[];
+	public inactivePlayers: PlayerModel[];
 	public isLastRound: boolean;
 	public lastRoundPlayerID: string;
-	public currPlayerIndex: number;
 	public isGameOver: boolean;
 
 }

@@ -4,8 +4,20 @@ const messageForm = document.getElementById('send-container')
 const messageInput = document.getElementById('message-input')
 
 const name = prompt('What is your name?')
-appendMessage('You joined')
+const lblName = document.getElementById('lblName');
+lblName.innerHTML = name;
+
 socket.emit('new-user', name)
+
+socket.on('connected', data => {
+	if (data.score !== '') {
+		const lblScore = document.getElementById('lblBankScore');
+		lblScore.innerHTML = data.score;
+
+	}
+
+	appendMessage("You: " + data.message);
+})
 
 socket.on('chat-message', data => {
 	appendMessage(`${data.name}: ${data.message}`)
@@ -99,10 +111,17 @@ socket.on('roll-reset', data => {
 
 messageForm.addEventListener('submit', e => {
 	e.preventDefault()
-	console.log(e.name)
+	
 	const message = messageInput.value
-	appendMessage(`You: ${message}`)
-	socket.emit('send-chat-message', message)
+
+	if (message.toUpperCase() === '/SCORES') {
+		socket.emit('get-scores')
+	}
+	else 
+	{ 
+		appendMessage(`You: ${message}`)
+		socket.emit('send-chat-message', message)
+	}
 	messageInput.value = ''
 })
 

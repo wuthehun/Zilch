@@ -6,7 +6,7 @@ class PlayerModel {
 	public playerID:string;
 	public playerName:string;
 	public currTurn: TurnModel;
-	public isActive: boolean;
+	public isStartedLastTurn: boolean;
 }
 
 export default PlayerModel

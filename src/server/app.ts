@@ -62,10 +62,28 @@ io.on("connection", (socket) => {
 
 		console.log(socket.id + " " + game.getNumPlayers());
 
-		game.setupPlayer(name, socket.id);
+		let player: PlayerModel = null;
+		try {
+			player = game.setupPlayer(name, socket.id);
+
+		}
+		catch (e) {
+			socket.emit("chat-message", {
+				message: "Cannot add player: " + e.message,
+				name: "SYSTEM",
+			});
+			return;
+		}
+		console.log(socket.id + " " + game.getNumPlayers());
 
 		users[socket.id] = name;
 		socket.broadcast.emit("user-connected", name);
+
+		socket.emit("connected", {
+			message: "You joined",
+			score: player.bankScore,
+		});
+
 
 		updateTurnSingle(socket);
 	});
@@ -80,6 +98,11 @@ io.on("connection", (socket) => {
 	socket.on("disconnect", () => {
 		console.log("bye " + socket.id + " " + game.getNumPlayers());
 
+		if (users[socket.id] == undefined) {
+			console.log("not found");
+			return;
+		}
+
 		if (game != undefined && !game.doesPlayerExist(socket.id)) {
 			delete users[socket.id];
 			return;
@@ -93,9 +116,11 @@ io.on("connection", (socket) => {
 				game.removePlayer(socket.id);
 
 				if (game.getNumPlayers() === 0 || game.isGameOver()) {
-					game.resetGame();
+					console.log("reset");
+					game.clearGame();
 				} 
 				else if(isCurrentPlayer) {
+					console.log("update all");
 					updateTurnAll(socket);
 				}
 			}
@@ -185,6 +210,19 @@ io.on("connection", (socket) => {
 
 		updateTurnAll(socket);
 	});
+
+	socket.on("get-scores", () => {
+		let scores:string = "\n";
+
+		for (let player of game.getActivePlayers()) {
+			scores = scores + player.playerName + ": " + player.bankScore.toString() + "\n";
+		}
+
+		socket.emit("chat-message", {
+			message: scores,
+			name: "SCORES",
+		});
+	})
 });
 
 function handleTurnChange(socket) {
@@ -203,7 +241,7 @@ function updateTurnAll(socket) {
 		socket.broadcast.emit("turn-change", game.getCurrentPlayer().playerName);
 	} 
 	else {
-		for (let player of game.getPlayers()) {
+		for (let player of game.getActivePlayers()) {
 			if (player.playerID !== game.getCurrentPlayer().playerID) {
 				io.to(player.playerID).emit(
 					"turn-change",
@@ -236,7 +274,7 @@ function handleGameOver(socket) {
 			game.getWinner().playerName
 		);
 	} else {
-		for (let player of game.getPlayers()) {
+		for (let player of game.getActivePlayers()) {
 			if (player.playerID !== game.getCurrentPlayer().playerID) {
 				io.to(player.playerID).emit(
 					"player-wins",

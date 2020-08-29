@@ -11,14 +11,14 @@ class GameController {
 		this.gameState = new GameStateModel();
 		this.gameState.isLastRound = false;
 		this.gameState.players = [];
+		this.gameState.inactivePlayers = [];
 		this.gameState.isGameOver = false;
 	}
 
 	public resetGame() {
 		this.gameState.isLastRound = false;
 		this.gameState.isGameOver = false;
-		this.gameState.lastRoundPlayerID = '';
-		this.gameState.currPlayerIndex = 0;
+		this.gameState.lastRoundPlayerID = "";
 
 		for (let player of this.gameState.players) {
 			player.bankScore = 0;
@@ -26,94 +26,95 @@ class GameController {
 		}
 	}
 
-	public isGameStarted():boolean {
+	public clearGame() {
+		this.resetGame();
+
+		this.gameState.players = [];
+		this.gameState.inactivePlayers = [];
+	}
+
+	public isGameStarted(): boolean {
 		return this.gameState != null && this.gameState != undefined;
 	}
 
-	public addPlayer(poPlayer:PlayerModel) {
+	public addPlayer(poPlayer: PlayerModel) {
 		this.gameState.players.push(poPlayer);
-		if (this.gameState.players.length === 1) {
-			this.gameState.currPlayerIndex = 0;
-		}
 	}
 
-	public removePlayer(id:string) {
-		if ((typeof (this.gameState) === 'undefined') || (typeof (this.gameState.players) === 'undefined')) {
+	public removePlayer(pID: string) {
+		if (
+			typeof this.gameState === "undefined" ||
+			typeof this.gameState.players === "undefined"
+		) {
 			return;
 		}
 
-		let deleteIndex: number = -1;
-		for (let index=0; index < this.gameState.players.length; index++) {
-			if (this.gameState.players[index].playerID === id) {
-				deleteIndex = index;
+		let removeIndex: number = -1;
+		for (let index = 0; index < this.gameState.players.length; index++) {
+			if (this.gameState.players[index].playerID === pID) {
+				removeIndex = index;
 			}
 		}
 
-		if (deleteIndex >= 0) {
-			this.gameState.players.splice(deleteIndex, 1);
-		}
-		else {
+		if (removeIndex >= 0) {
+			let removePlayer: PlayerModel = this.gameState.players[removeIndex];
+			this.gameState.inactivePlayers.push(removePlayer);
+			this.gameState.players.splice(removeIndex, 1);
+		} else {
 			this.gameState.players = [];
-		}
-
-		if (this.gameState.currPlayerIndex >= this.gameState.players.length) {
-			this.gameState.currPlayerIndex = 0;
 		}
 	}
 
-	public getCurrentPlayer():PlayerModel {
+	public getCurrentPlayer(): PlayerModel {
 		if (this.gameState == undefined) {
 			return null;
 		}
 
-		if (this.gameState.currPlayerIndex == undefined) {
-			this.gameState.currPlayerIndex = 0;
+		if (
+			this.getActivePlayers().length === 0
+		) {
+			return null;
 		}
 
-		return this.gameState.players[this.gameState.currPlayerIndex];
-
+		return this.getActivePlayers()[0];
 	}
 
 	public moveToNextPlayer() {
-		if (this.gameState == undefined || this.gameState.currPlayerIndex == undefined) {
+		if (this.gameState == undefined) {
 			return;
 		}
 
 		const prevPlayer: PlayerModel = this.getCurrentPlayer();
 		prevPlayer.currentScore = 0;
 
-		let nextPlayerIndex: number = this.gameState.currPlayerIndex + 1;
-		if (nextPlayerIndex >= this.gameState.players.length) {
-			nextPlayerIndex = 0;
-		}
+		this.gameState.players.splice(0, 1);
+		this.gameState.players.push(prevPlayer);
 
-		this.gameState.currPlayerIndex = nextPlayerIndex;
 		this.getCurrentPlayer().currentScore = 0;
 		this.getCurrentPlayer().currTurn = this.getNewTurn();
 
 		if (this.gameState.isLastRound) {
-			if (this.getCurrentPlayer().playerID === this.gameState.lastRoundPlayerID) {
+			if (
+				this.getCurrentPlayer().playerID === this.gameState.lastRoundPlayerID ||
+				this.getCurrentPlayer().isStartedLastTurn
+			) {
 				this.gameState.isGameOver = true;
+			} else {
+				prevPlayer.isStartedLastTurn = true;
 			}
-
 		} else {
 			this.updateEndGameState(prevPlayer);
 		}
-
 	}
 
 	public processTurn(poPlayer: PlayerModel, pIsBankScore: boolean) {
-
-		const zEngine:ZilchEngine = new ZilchEngine();
+		const zEngine: ZilchEngine = new ZilchEngine();
 		if (pIsBankScore) {
 			this.bankCurrentTurn(poPlayer);
-		}
-		else {
+		} else {
 			this.addCurrentTurn(poPlayer);
 
 			this.markCurretlyLocked(poPlayer.currTurn);
-
-
 		}
 	}
 
@@ -130,7 +131,12 @@ class GameController {
 		newTurn.dices = [];
 
 		for (let index = 0; index < 6; index++) {
-			newTurn.dices.push({ value: 0, isLocked: false, isLockedPrev: false, isUsed: false });
+			newTurn.dices.push({
+				value: 0,
+				isLocked: false,
+				isLockedPrev: false,
+				isUsed: false,
+			});
 		}
 
 		return newTurn;
@@ -146,12 +152,11 @@ class GameController {
 		return false;
 	}
 
-	public rollDice(poTurn:TurnModel):ScoreModel[] {
+	public rollDice(poTurn: TurnModel): ScoreModel[] {
 		const zEngine: ZilchEngine = new ZilchEngine();
 		zEngine.rollDice(poTurn);
 
 		return zEngine.getPossibleScoreCombos(poTurn);
-
 	}
 
 	protected addCurrentTurn(poPlayer: PlayerModel) {
@@ -159,7 +164,7 @@ class GameController {
 		const zEngine: ZilchEngine = new ZilchEngine();
 		currScore = zEngine.getBestScore(poPlayer.currTurn);
 		if (currScore === 0) {
-			throw new Error('Must lock a score value');
+			throw new Error("Must lock a score value");
 		}
 		poPlayer.currentScore = poPlayer.currentScore + currScore;
 	}
@@ -169,8 +174,10 @@ class GameController {
 		const zEngine: ZilchEngine = new ZilchEngine();
 		currScore = poPlayer.currentScore + zEngine.getBestScore(poPlayer.currTurn);
 
-		if (!((poPlayer.bankScore >= 500 && currScore >= 300) || (currScore >= 500))) {
-			throw new Error('Current score not high enough to bank');
+		if (
+			!((poPlayer.bankScore >= 500 && currScore >= 300) || currScore >= 500)
+		) {
+			throw new Error("Current score not high enough to bank");
 		}
 
 		poPlayer.currentScore = currScore;
@@ -192,7 +199,7 @@ class GameController {
 		}
 
 		let highestPlayer: PlayerModel = null;
-		for (let player of this.gameState.players) {
+		for (let player of this.getActivePlayers()) {
 			if (highestPlayer == null) {
 				highestPlayer = player;
 			} else if (highestPlayer.bankScore < player.bankScore) {
@@ -204,22 +211,30 @@ class GameController {
 	}
 
 	public isGameOver(): boolean {
-		if ((this.gameState == undefined) || (this.gameState == null)) {
+		if (this.gameState == undefined || this.gameState == null) {
 			return false;
 		}
 
 		return this.gameState.isGameOver;
 	}
 
-	public getPlayers(): PlayerModel[] {
-		if ((this.gameState == undefined) || (this.gameState == null)) {
+	public getActivePlayers(): PlayerModel[] {
+		if (this.gameState == undefined || this.gameState == null) {
 			return [];
 		}
 
-		return this.gameState.players
+		return this.gameState.players;
 	}
-	
-	public areAllDiceUsed(poTurn:TurnModel): boolean {
+
+	public getInactivePlayers(): PlayerModel[] {
+		if (this.gameState == undefined || this.gameState == null) {
+			return [];
+		}
+
+		return this.gameState.inactivePlayers;
+	}
+
+	public areAllDiceUsed(poTurn: TurnModel): boolean {
 		for (let dice of poTurn.dices) {
 			if (!dice.isUsed) {
 				return false;
@@ -229,7 +244,7 @@ class GameController {
 		return true;
 	}
 
-	public resetAfterUsedAllDice(poTurn:TurnModel) {
+	public resetAfterUsedAllDice(poTurn: TurnModel) {
 		for (let dice of poTurn.dices) {
 			dice.isLocked = false;
 			dice.isLockedPrev = false;
@@ -240,12 +255,13 @@ class GameController {
 	public getNumPlayers(): number {
 		if (this.gameState == undefined) {
 			return -1;
-		} 
-		return this.gameState.players.length;
+		}
+
+		return this.getActivePlayers().length;
 	}
 
 	public doesPlayerExist(pSocketID: string): boolean {
-		for (let player of this.getPlayers()) {
+		for (let player of this.getActivePlayers()) {
 			if (player.playerID === pSocketID) {
 				return true;
 			}
@@ -254,26 +270,39 @@ class GameController {
 		return false;
 	}
 
-	public setupPlayer(pName: string, pSocketID: string) {
+	public setupPlayer(pName: string, pSocketID: string): PlayerModel {
 		let newPlayer: PlayerModel = null;
-		for (let player of this.getPlayers()) {
+		for (let index = 0; index < this.getActivePlayers().length; index++) {
+			let player: PlayerModel = this.getActivePlayers()[index];
 			if (player.playerName.toUpperCase() === pName.toUpperCase()) {
-				newPlayer = player;
+				throw new Error("Duplicate name not allowed!");
 			}
+		}
+
+		// if found in inactive list, pull it out
+		for (let index = 0; index < this.getInactivePlayers().length; index++) {
+			let player: PlayerModel = this.getInactivePlayers()[index];
+
+			newPlayer = player;
+			this.gameState.inactivePlayers.splice(index, 1);
+			// this is causing ordering issues. current player index gets screwed up
+			console.log(newPlayer.playerName + " found");
+			continue;
 		}
 
 		if (newPlayer == null) {
 			newPlayer = new PlayerModel();
 			newPlayer.bankScore = 0;
-			newPlayer.currentScore = 0;
 			newPlayer.playerName = pName;
-
-			newPlayer.currTurn = this.getNewTurn();
-
-			this.addPlayer(newPlayer);
+			newPlayer.isStartedLastTurn = false;
 		}
 
+		newPlayer.currentScore = 0;
+		newPlayer.currTurn = this.getNewTurn();
 		newPlayer.playerID = pSocketID;
+
+		this.addPlayer(newPlayer);
+		return newPlayer;
 	}
 
 	public applyPlayerLocks(pLocks: boolean[], pTurn: TurnModel) {
@@ -282,8 +311,7 @@ class GameController {
 				pTurn.dices[index].isLocked = true;
 			}
 		}
-	
 	}
 }
 
-export default GameController
+export default GameController;
