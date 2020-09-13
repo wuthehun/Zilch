@@ -1,0 +1,30 @@
+.main {
+	background: #003594;
+	height: 100%;
+}
+.body {
+	margin-left: 36px;
+	margin-right: 36px;
+}
+
+.player-name {
+	font-style: normal;
+	font-weight: normal;
+	font-size: 64px;
+	line-height: 75px;
+	display: flex;
+	align-items: center;
+	color: #ffd100;
+	margin-bottom: 24px;
+
+}
+
+.player-score {
+	font-style: normal;
+	font-weight: normal;
+	font-size: 24px;
+	display: flex;
+	align-items: center;
+	color: #ffd100;
+	margin-bottom: 24px;
+}

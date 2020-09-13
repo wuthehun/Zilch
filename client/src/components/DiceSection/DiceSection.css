@@ -1,0 +1,29 @@
+.dices {
+	display: flex;
+	margin-bottom: 24px;
+}
+
+.dice-button-section {
+	display: flex;
+	margin-left: 180px;
+}
+
+.dice-button {
+	width: 168px;
+	height: 50px;
+	background: #ffd100;
+	border: 1px solid #1c3144;
+	box-sizing: border-box;
+	border-radius: 10px;
+	margin-right: 24px;
+	cursor: pointer;
+	align-items: center;
+	text-align: center;
+	font-size: 36px;
+	font-weight: bolder;
+	color: #1c3144;
+}
+
+.dice-section {
+	margin-bottom: 24px;
+}

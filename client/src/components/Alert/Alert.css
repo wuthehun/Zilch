@@ -1,0 +1,33 @@
+.alert-body {
+	position: absolute;
+	width: 100%;
+	background-color: #ffe15c;
+	top: 25%;
+	left: 0px;
+	padding-top:24px;
+	padding-bottom:24px;
+	z-index: 999;
+	border-bottom: 10px solid #ffd100;
+
+}
+
+.alert-text {
+	margin-left: 24px;
+	margin-bottom: 12px;
+	width:100%;
+	font-size: 64px;
+	text-align: center;
+	font-weight: bolder;
+	color: #1c3144;
+}
+
+.parent-disable {
+	position: fixed;
+	top: 0;
+	left: 0;
+	background: #000;
+	opacity: 0.4;
+	z-index: 998;
+	height: 100%;
+	width: 100%;
+}

@@ -1,0 +1,15 @@
+.header {
+	box-sizing: border-box;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	margin-bottom: 24px;
+	background-color: #ffd100;
+	color: #003594;
+	height: 48px;
+}
+
+.header-text {
+	font-size: 36px;
+	font-weight: bolder;
+}

@@ -1,0 +1,62 @@
+.modal-body {
+	position: absolute;
+	width: 40%;
+	background-color: #ffe15c;
+	border: 1px solid #1c3144;
+	box-sizing: border-box;
+	border-radius: 10px;
+	top: 25%;
+	left: 30%;
+	padding-top:24px;
+	padding-bottom:24px;
+	z-index: 999;
+
+}
+
+.modal-text {
+	margin-left: 24px;
+	margin-bottom: 12px;
+}
+
+.modal-input {
+	margin-left: 24px;
+	margin-right: 24px;
+	margin-bottom: 12px;
+}
+
+.modal-input input {
+	width: 100%;
+}
+
+.modal-buttons {
+	margin-left: 24px;
+	margin-right: 24px;
+	display: flex;
+	float: right;	
+}
+
+.modal-buttons div {
+	width:70px;
+	margin-left: 12px;
+	background: #ffd100;
+	border: 1px solid #1c3144;
+	box-sizing: border-box;
+	border-radius: 5px;
+	cursor: pointer;
+	align-items: center;
+	text-align: center;
+	font-size: 16px;
+	font-weight: bolder;
+	color: #1c3144;
+}
+
+.parent-disable {
+	position: fixed;
+	top: 0;
+	left: 0;
+	background: #000;
+	opacity: 0.4;
+	z-index: 998;
+	height: 100%;
+	width: 100%;
+}

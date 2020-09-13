@@ -7,10 +7,10 @@ import GameController from "./game/GameController";
 /**
  * things to do:
  * - clean up
- * -- refactor out game controller that is in app.ts
- * -- app.ts should only handle FE comm
+ * -- * refactor out game controller that is in app.ts
+ * -- * app.ts should only handle FE comm
  * -- maybe create a main class for FE comm
- * -- revise user messages to make them look nicer
+ * -- * revise user messages to make them look nicer
  * -- probably need to add a list of all socket.io message names
  * -- probably need to break up files.  app.ts and gamecontroller.ts should be smaller
  * -- player refresh and keep
@@ -28,8 +28,8 @@ import GameController from "./game/GameController";
 
 // Setup express and socket.io servers
 const app = express();
-const port = process.env.PORT || 3000;
-app.set("port", process.env.PORT || 3000);
+const port = process.env.PORT || 3001;
+app.set("port", process.env.PORT || 3001);
 
 const http = require("http").Server(app);
 const io = require("socket.io")(http);

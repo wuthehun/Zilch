@@ -1,0 +1,42 @@
+.dice {
+	background: #ffd100;
+	border: 1px solid #1c3144;
+	box-sizing: border-box;
+	border-radius: 10px;
+	width: 100px;
+	height: 100px;
+	margin-right: 24px;
+	cursor: pointer;
+}
+
+.value-text {
+	font-size: 72px;
+	line-height: 84px;
+	align-items: center;
+	text-align: center;
+	width: 100%;
+
+	color: #1c3144;
+}
+
+.locked-text {
+	font-size: 14px;
+	line-height: 16px;
+	align-items: center;
+	text-align: center;
+	position: relative;
+	top: -10px;
+	color: #ffe15c;
+}
+
+.locked-dice {
+	border-color: #ffe15c;
+}
+
+.locked-value {
+	color: #ffe15c;
+}
+
+.locked-cursor {
+	cursor: default;
+}

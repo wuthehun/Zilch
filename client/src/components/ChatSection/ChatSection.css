@@ -1,0 +1,23 @@
+.message-container {
+	width: 100%;
+	max-width: 1200px;
+	height: 35vh;
+	max-height: 35vh;
+	overflow: auto;
+	overflow-y: scroll;
+	border-width: 1px;
+	border-color: #1C3144;
+	border:outset;
+	background-color: #FFE15C;
+}
+
+.message {
+	background-color: #FFD100;
+	padding: 5px;
+	white-space: pre-wrap;
+}
+
+.message:nth-child(2n) {
+	background-color: #FFE15C;
+	white-space: pre-wrap;
+}
