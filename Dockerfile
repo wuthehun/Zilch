@@ -1,6 +1,6 @@
 FROM node:12
 
-WORKDIR /usr/src/app/
+WORKDIR /zilch/server
 
 COPY package*.json ./
 
@@ -8,10 +8,9 @@ RUN npm install
 
 
 
-COPY dist /usr/src/app/dist
+COPY dist /zilch/server/dist
+COPY client/build /zilch/server/client/build
 
-COPY src/client /usr/src/app/src/client
-
-EXPOSE 3000
+EXPOSE 3001
 CMD gunicorn --bind 0.0.0.0:$PORT wsgi
 CMD ["node", "dist/app.js"]

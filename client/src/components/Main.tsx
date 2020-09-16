@@ -39,7 +39,7 @@ class Main extends React.Component<any, MainState> {
 			isShowReset: false,
 		};
 
-		socket = io("http://localhost:3001");
+		socket = io();
 		socket.on("chat-message", this.handleChatMessage);
 		socket.on("connected", this.handleConnected);
 		socket.on("user-disconnected", this.handleUserDisconnected);

@@ -1,0 +1,33 @@
+version: "2"
+services:
+  client:
+    restart: always
+    build:
+      context: ./client
+      dockerfile: dockerfile
+    ports:
+      - "3000:3000"
+    working_dir: /zilch/client
+    stdin_open: true
+    volumes:
+      - ./client:/projects/zilch/client
+    entrypoint: ["npm", "start"]
+    links:
+      - api
+    networks:
+      - webappnetwork
+  api:
+    restart: always
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./api:/projects/zilch
+      - /node_modules
+    networks:
+        - webappnetwork
+networks: 
+  webappnetwork:
+    driver: bridge

@@ -20,6 +20,10 @@ class Dice extends React.Component<DiceProps> {
 
 	getDiceClass = (): string => {
 		let sClass: string = "dice";
+		if (this.props.value === "0") {
+			return sClass;
+		}
+
 		if (this.props.isChecked || this.props.isLocked) {
 			sClass = sClass + " locked-dice";
 		}
@@ -42,10 +46,10 @@ class Dice extends React.Component<DiceProps> {
 	};
 
 	handleDiceOnClick = () => {
-		if (!this.props.isLocked) {
+		if (!this.props.isLocked && this.props.value !== "0") {
 			const bIsChecked: boolean = this.props.isChecked;
 			this.setState({ isChecked: !bIsChecked });
-			this.props.onCheckChange(!bIsChecked, (this.props.index));
+			this.props.onCheckChange(!bIsChecked, this.props.index);
 		}
 	};
 
@@ -53,7 +57,7 @@ class Dice extends React.Component<DiceProps> {
 		return (
 			<div className={this.getDiceClass()} onClick={this.handleDiceOnClick}>
 				<div className={this.getValueClass()}>{this.props.value}</div>
-				{this.props.isChecked || this.props.isLocked? (
+				{this.props.isChecked || this.props.isLocked ? (
 					<div className="locked-text">Locked</div>
 				) : (
 					<></>

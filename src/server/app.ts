@@ -34,13 +34,7 @@ app.set("port", process.env.PORT || 3001);
 const http = require("http").Server(app);
 const io = require("socket.io")(http);
 
-app.get("/", (req, res) => {
-	res.sendFile(path.resolve("./src/client/index.html"));
-});
-
-app.get("/script.js", (req, res) => {
-	res.sendFile(path.resolve("./src/client/script.js"));
-});
+app.use(express.static("./client/build"));
 
 const server = http.listen(port, (err) => {
 	if (err) {
