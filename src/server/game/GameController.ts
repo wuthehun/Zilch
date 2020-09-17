@@ -3,6 +3,7 @@ import PlayerModel from "./PlayerModel";
 import TurnModel from "./TurnModel";
 import ZilchEngine from "./ZilchEngine";
 import ScoreModel from "./ScoreModel";
+import PlayerScoreModel from "./PlayerScoreModel";
 
 class GameController {
 	private gameState: GameStateModel;
@@ -70,9 +71,7 @@ class GameController {
 			return null;
 		}
 
-		if (
-			this.getActivePlayers().length === 0
-		) {
+		if (this.getActivePlayers().length === 0) {
 			return null;
 		}
 
@@ -311,6 +310,20 @@ class GameController {
 				pTurn.dices[index].isLocked = true;
 			}
 		}
+	}
+
+	public getPlayerScores(): PlayerScoreModel[] {
+		let scores: PlayerScoreModel[] = [];
+
+		for (let player of this.getActivePlayers()) {
+			scores.push({
+				name: player.playerName,
+				currScore: player.currentScore.toString(),
+				bankScore: player.bankScore.toString(),
+			});
+		}
+
+		return scores
 	}
 }
 

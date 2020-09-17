@@ -1,11 +1,11 @@
 .dices {
 	display: flex;
-	margin-bottom: 24px;
+	flex-wrap: wrap;
 }
 
 .dice-button-section {
 	display: flex;
-	margin-left: 180px;
+	align-items: center;
 }
 
 .dice-button {

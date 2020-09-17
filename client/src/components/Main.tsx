@@ -8,6 +8,7 @@ import Alert from "./Alert/Alert";
 import io from "socket.io-client";
 import { RollModel } from "../models/RollModel";
 import { DiceModel } from "../models/DiceModel";
+import { ScoreModel } from "../models/ScoreModel";
 
 export interface MainState {
 	name: string;
@@ -19,6 +20,7 @@ export interface MainState {
 	alertMessage: string;
 	dices: DiceModel[];
 	isShowReset: boolean;
+	scores: ScoreModel[];
 }
 
 let socket: SocketIOClient.Socket;
@@ -37,6 +39,7 @@ class Main extends React.Component<any, MainState> {
 			alertMessage: "",
 			dices: this.getResetDice(),
 			isShowReset: false,
+			scores: [],
 		};
 
 		socket = io();
@@ -104,12 +107,15 @@ class Main extends React.Component<any, MainState> {
 				currScore: "0",
 				bankScore: roll.bankScore.toString(),
 				dices: roll.roll.dices,
+				scores: roll.playerScores,
 			});
 		} else {
 			this.setState({
 				currScore: roll.score.toString(),
 				bankScore: roll.bankScore.toString(),
 				dices: roll.roll.dices,
+				scores: roll.playerScores,
+
 			});
 		}
 	};
@@ -155,19 +161,28 @@ class Main extends React.Component<any, MainState> {
 		});
 	};
 
-	addChatMessage = (data: { name: string; message: string }) => {
+	addChatMessage = (data: { name: string; message: string;  playerScores?: ScoreModel[]}) => {
 		let messages: { name: string; message: string }[] = this.state.messages;
 		messages.splice(0, 0, { name: data.name, message: data.message });
 
-		this.setState({
-			messages: messages,
-		});
+		if (data.playerScores) {
+			this.setState({
+				messages: messages,
+				scores: data.playerScores,
+			});
+	
+		} else {
+			this.setState({
+				messages: messages,
+			});
+	
+		}
 	};
 
 	showAlert = (message: string) => {
 		this.setState({
 			isShowAlertModal: true,
-			alertMessage: message,
+			alertMessage: this.state.alertMessage + " " + message,
 		});
 
 		setTimeout(() => {
@@ -254,11 +269,10 @@ class Main extends React.Component<any, MainState> {
 	handleOnReset = () => {
 		this.setState({
 			isShowReset: false,
-		})
-	
-		socket.emit('reset', 'reset');
-	}
-	
+		});
+
+		socket.emit("reset", "reset");
+	};
 
 	render() {
 		return (
@@ -284,7 +298,10 @@ class Main extends React.Component<any, MainState> {
 						onBank={this.handleOnBank}
 						onDiceChecked={this.handleOnDiceChecked}
 					></DiceSection>
-					<ChatSection messages={this.state.messages}></ChatSection>
+					<ChatSection
+						messages={this.state.messages}
+						scores={this.state.scores}
+					></ChatSection>
 				</div>
 				<Modal
 					isShown={this.state.isShowNameModal}
@@ -305,7 +322,6 @@ class Main extends React.Component<any, MainState> {
 					text={this.state.alertMessage}
 					onClose={this.handleAlertClose}
 				></Alert>
-
 			</div>
 		);
 	}

@@ -1,4 +1,5 @@
 import { DiceModel } from "./DiceModel";
+import { ScoreModel } from "./ScoreModel";
 
 export interface RollModel {
 	score: number;
@@ -6,4 +7,5 @@ export interface RollModel {
 	roll: { dices: DiceModel[] };
 	isReset: boolean;
 	message: string;
+	playerScores: ScoreModel[];
 }

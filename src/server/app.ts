@@ -28,8 +28,8 @@ import GameController from "./game/GameController";
 
 // Setup express and socket.io servers
 const app = express();
-const port = process.env.PORT || 3001;
-app.set("port", process.env.PORT || 3001);
+const port = process.env.PORT || 3000;
+app.set("port", process.env.PORT || 3000);
 
 const http = require("http").Server(app);
 const io = require("socket.io")(http);
@@ -185,6 +185,7 @@ io.on("connection", (socket) => {
 		socket.broadcast.emit("chat-message", {
 			message: message,
 			name: users[socket.id],
+			playerScores: game.getPlayerScores(),
 		});
 
 		socket.emit("roll-message", {
@@ -194,6 +195,7 @@ io.on("connection", (socket) => {
 			score: player.currentScore,
 			bankScore: player.bankScore,
 			isReset: true,
+			playerScores: game.getPlayerScores(),
 		});
 
 		handleTurnChange(socket);
@@ -338,6 +340,7 @@ function handleRollDice(socket, pPlayer: PlayerModel, pIsReroll: boolean) {
 	socket.broadcast.emit("chat-message", {
 		message: message,
 		name: users[socket.id],
+		playerScores: game.getPlayerScores(),
 	});
 
 	socket.emit("roll-message", {
@@ -346,11 +349,11 @@ function handleRollDice(socket, pPlayer: PlayerModel, pIsReroll: boolean) {
 		roll: pPlayer.currTurn,
 		score: pPlayer.currentScore,
 		bankScore: pPlayer.bankScore,
+		playerScores: game.getPlayerScores(),
 	});
 
 	if (scores.length === 0) {
 		pPlayer.currTurn = game.getNewTurn();
-		handleTurnChange(socket);
 		socket.broadcast.emit("chat-message", {
 			message: "ZILCH! Next Player Turn!",
 			name: users[socket.id],
@@ -360,6 +363,8 @@ function handleRollDice(socket, pPlayer: PlayerModel, pIsReroll: boolean) {
 			message: "ZILCH! Next Player Turn!",
 			name: "You",
 		});
+		handleTurnChange(socket);
+
 	}
 
 	

@@ -1,6 +1,4 @@
-.message-container {
-	width: 100%;
-	max-width: 1200px;
+.container-message {
 	height: 35vh;
 	max-height: 35vh;
 	overflow: auto;
@@ -9,6 +7,8 @@
 	border-color: #1C3144;
 	border:outset;
 	background-color: #FFE15C;
+	margin-right: 36px;
+	margin-bottom: 24px;
 }
 
 .message {
@@ -20,4 +20,37 @@
 .message:nth-child(2n) {
 	background-color: #FFE15C;
 	white-space: pre-wrap;
+}
+
+.chat-container {
+	width: 100%;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.container-score {
+	height: 35vh;
+	max-height: 35vh;
+	overflow: auto;
+	overflow-y: scroll;
+	border-width: 1px;
+	border-color: #1C3144;
+	border:outset;
+	background-color: #FFE15C;
+	margin-right: 36px;
+	margin-bottom: 24px;
+}
+
+[class*="container-"] {
+  min-width: 80vw;
+}
+
+@media only screen and (min-width: 768px) { 
+	.container-score {
+		min-width: 40vw;
+	}
+
+	.container-message {
+		min-width: 40vw;
+	}
 }
