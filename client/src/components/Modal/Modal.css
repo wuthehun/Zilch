@@ -1,12 +1,10 @@
 .modal-body {
 	position: absolute;
-	width: 40%;
 	background-color: #ffe15c;
 	border: 1px solid #1c3144;
 	box-sizing: border-box;
 	border-radius: 10px;
 	top: 25%;
-	left: 30%;
 	padding-top:24px;
 	padding-bottom:24px;
 	z-index: 999;
@@ -33,6 +31,16 @@
 	margin-right: 24px;
 	display: flex;
 	float: right;	
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+
+	/*
+		Introduced in Internet Explorer 10.
+		See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+	*/
+	-ms-user-select: none;
+	user-select: none;
 }
 
 .modal-buttons div {
@@ -59,4 +67,18 @@
 	z-index: 998;
 	height: 100%;
 	width: 100%;
+}
+
+[class*="modal-body"] {
+	width: 100%;
+	left: 0;
+
+}
+
+@media only screen and (min-width: 768px) { 
+	.modal-body {
+		width: 40%;
+		left: 30%;
+
+	}
 }

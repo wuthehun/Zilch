@@ -11,11 +11,6 @@ export interface DiceSectionProps {
 }
 
 class DiceSection extends React.Component<DiceSectionProps> {
-	constructor(props: any) {
-		super(props);
-
-	}
-
 	render() {
 		return (
 			<div className="dice-section">

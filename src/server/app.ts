@@ -1,5 +1,4 @@
 import express from "express";
-import path from "path";
 import ScoreModel from "./game/ScoreModel";
 import PlayerModel from "./game/PlayerModel";
 import GameController from "./game/GameController";
@@ -44,24 +43,28 @@ const server = http.listen(port, (err) => {
 });
 // end setup
 
-
 const users = {};
 const game: GameController = new GameController();
 
 io.on("connection", (socket) => {
-	socket.on("new-user", (name) => {
+	socket.on("new-user", (name: string) => {
 		if (!game.isGameStarted()) {
 			game.startNewGame();
+		}
+
+		let playerName: string = name;
+		let isAdmin: boolean = false;
+		if (name.startsWith("Admin-")) {
+			playerName = name.replace("Admin-", "");
+			isAdmin = true;
 		}
 
 		console.log(socket.id + " " + game.getNumPlayers());
 
 		let player: PlayerModel = null;
 		try {
-			player = game.setupPlayer(name, socket.id);
-
-		}
-		catch (e) {
+			player = game.setupPlayer(playerName, socket.id, isAdmin);
+		} catch (e) {
 			socket.emit("chat-message", {
 				message: "Cannot add player: " + e.message,
 				name: "SYSTEM",
@@ -70,14 +73,14 @@ io.on("connection", (socket) => {
 		}
 		console.log(socket.id + " " + game.getNumPlayers());
 
-		users[socket.id] = name;
-		socket.broadcast.emit("user-connected", name);
+		users[socket.id] = playerName;
+		socket.broadcast.emit("user-connected", playerName);
 
 		socket.emit("connected", {
 			message: "You joined",
 			score: player.bankScore,
+			isAdmin: isAdmin,
 		});
-
 
 		updateTurnSingle(socket);
 	});
@@ -103,17 +106,16 @@ io.on("connection", (socket) => {
 		}
 
 		if (game != undefined && game.isGameStarted()) {
-
 			const currentPlayer: PlayerModel = game.getCurrentPlayer();
 			if (currentPlayer != null) {
-				const isCurrentPlayer: boolean = game.getCurrentPlayer().playerID === socket.id;
+				const isCurrentPlayer: boolean =
+					game.getCurrentPlayer().playerID === socket.id;
 				game.removePlayer(socket.id);
 
 				if (game.getNumPlayers() === 0 || game.isGameOver()) {
 					console.log("reset");
 					game.clearGame();
-				} 
-				else if(isCurrentPlayer) {
+				} else if (isCurrentPlayer) {
 					console.log("update all");
 					updateTurnAll(socket);
 				}
@@ -121,8 +123,7 @@ io.on("connection", (socket) => {
 		}
 
 		socket.broadcast.emit("user-disconnected", users[socket.id]);
-		delete users[socket.id];	
-
+		delete users[socket.id];
 	});
 
 	socket.on("roll", (dataIsLocked: boolean[]) => {
@@ -145,8 +146,7 @@ io.on("connection", (socket) => {
 
 		if (game.isFirstRoll(player.currTurn)) {
 			handleRollDice(socket, player, false);
-		}
-		else {
+		} else {
 			handleReroll(socket, dataIsLocked);
 		}
 	});
@@ -202,23 +202,31 @@ io.on("connection", (socket) => {
 	});
 
 	socket.on("reset", () => {
-		game.resetGame();
+		let player: PlayerModel = game.findPlayerByID(socket.id);
+		if (player) {
+			game.resetGame(player.isAdmin);
+		}
+		else {
+			game.resetGame(false);
+		}
+
 
 		updateTurnAll(socket);
 	});
 
 	socket.on("get-scores", () => {
-		let scores:string = "\n";
+		let scores: string = "\n";
 
 		for (let player of game.getActivePlayers()) {
-			scores = scores + player.playerName + ": " + player.bankScore.toString() + "\n";
+			scores =
+				scores + player.playerName + ": " + player.bankScore.toString() + "\n";
 		}
 
 		socket.emit("chat-message", {
 			message: scores,
 			name: "SCORES",
 		});
-	})
+	});
 });
 
 function handleTurnChange(socket) {
@@ -235,8 +243,7 @@ function updateTurnAll(socket) {
 	if (game.getCurrentPlayer().playerID === socket.id) {
 		socket.emit("your-turn", "you");
 		socket.broadcast.emit("turn-change", game.getCurrentPlayer().playerName);
-	} 
-	else {
+	} else {
 		for (let player of game.getActivePlayers()) {
 			if (player.playerID !== game.getCurrentPlayer().playerID) {
 				io.to(player.playerID).emit(
@@ -253,29 +260,19 @@ function updateTurnAll(socket) {
 function updateTurnSingle(socket) {
 	if (game.getCurrentPlayer().playerID === socket.id) {
 		socket.emit("your-turn", "you");
-	} 
-	else {
-		socket.emit(
-			"turn-change",
-			game.getCurrentPlayer().playerName
-		);
+	} else {
+		socket.emit("turn-change", game.getCurrentPlayer().playerName);
 	}
 }
 
 function handleGameOver(socket) {
 	if (game.getWinner().playerID === socket.id) {
 		socket.emit("you-win", "you");
-		socket.broadcast.emit(
-			"player-wins",
-			game.getWinner().playerName
-		);
+		socket.broadcast.emit("player-wins", game.getWinner().playerName);
 	} else {
 		for (let player of game.getActivePlayers()) {
 			if (player.playerID !== game.getCurrentPlayer().playerID) {
-				io.to(player.playerID).emit(
-					"player-wins",
-					game.getWinner().playerName
-				);
+				io.to(player.playerID).emit("player-wins", game.getWinner().playerName);
 			}
 		}
 
@@ -290,8 +287,7 @@ function handleReroll(socket, dataIsLocked) {
 
 	try {
 		game.processTurn(player, false);
-	}
-	catch (e) {
+	} catch (e) {
 		socket.emit("chat-message", {
 			message: e.message,
 			name: "SYSTEM",
@@ -319,7 +315,6 @@ function handleReroll(socket, dataIsLocked) {
 }
 
 function handleRollDice(socket, pPlayer: PlayerModel, pIsReroll: boolean) {
-
 	let scores: ScoreModel[] = game.rollDice(pPlayer.currTurn);
 
 	let message: string = "Roll: ";
@@ -334,7 +329,8 @@ function handleRollDice(socket, pPlayer: PlayerModel, pIsReroll: boolean) {
 	message = message + "\nPossible Scores: \n";
 
 	for (let score of scores) {
-		message = message + " - " + score.scoreType + " " + score.value.toString() + "\n";
+		message =
+			message + " - " + score.scoreType + " " + score.value.toString() + "\n";
 	}
 
 	socket.broadcast.emit("chat-message", {
@@ -364,8 +360,5 @@ function handleRollDice(socket, pPlayer: PlayerModel, pIsReroll: boolean) {
 			name: "You",
 		});
 		handleTurnChange(socket);
-
 	}
-
-	
 }

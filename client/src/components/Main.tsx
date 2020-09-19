@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Header from "./Header/Header";
 import DiceSection from "./DiceSection/DiceSection";
 import ChatSection from "./ChatSection/ChatSection";
@@ -21,6 +21,7 @@ export interface MainState {
 	dices: DiceModel[];
 	isShowReset: boolean;
 	scores: ScoreModel[];
+	isAdmin: boolean;
 }
 
 let socket: SocketIOClient.Socket;
@@ -40,6 +41,7 @@ class Main extends React.Component<any, MainState> {
 			dices: this.getResetDice(),
 			isShowReset: false,
 			scores: [],
+			isAdmin: false,
 		};
 
 		socket = io();
@@ -68,8 +70,11 @@ class Main extends React.Component<any, MainState> {
 		];
 	};
 
-	handleConnected = (data: { name: string; message: string }) => {
+	handleConnected = (data: { name: string; message: string, isAdmin: boolean }) => {
 		this.addChatMessage({ name: "SYSTEM", message: data.message });
+		this.setState({
+			isAdmin: data.isAdmin,
+		});
 	};
 
 	handleUserDisconnected = (name: string) => {
@@ -244,13 +249,8 @@ class Main extends React.Component<any, MainState> {
 
 	handleOnBank = () => {
 		let dataIsLocked = [];
-		let hasLocked = false;
 
 		for (let index = 0; index < 6; index++) {
-			if (this.state.dices[index].isChecked) {
-				hasLocked = true;
-			}
-
 			dataIsLocked.push(this.state.dices[index].isChecked);
 		}
 
@@ -267,6 +267,10 @@ class Main extends React.Component<any, MainState> {
 	};
 
 	handleOnReset = () => {
+		if (!this.state.isAdmin) {
+			return
+		}
+
 		this.setState({
 			isShowReset: false,
 		});
@@ -277,7 +281,7 @@ class Main extends React.Component<any, MainState> {
 	render() {
 		return (
 			<div className="main">
-				<Header></Header>
+				<Header isUserAdmin={this.state.isAdmin} onReset={this.handleOnReset}></Header>
 				<div className="body">
 					<div className="player-name">{this.state.name}</div>
 					<div className="player-score">

@@ -16,7 +16,11 @@ class GameController {
 		this.gameState.isGameOver = false;
 	}
 
-	public resetGame() {
+	public resetGame(pIsForceReset:boolean) {
+		if (!(this.gameState.isGameOver || pIsForceReset)) {
+			return;
+		}
+
 		this.gameState.isLastRound = false;
 		this.gameState.isGameOver = false;
 		this.gameState.lastRoundPlayerID = "";
@@ -25,10 +29,15 @@ class GameController {
 			player.bankScore = 0;
 			player.currentScore = 0;
 		}
+
+		for (let player of this.gameState.inactivePlayers) {
+			player.bankScore = 0;
+			player.currentScore = 0;
+		}
 	}
 
 	public clearGame() {
-		this.resetGame();
+		this.resetGame(true);
 
 		this.gameState.players = [];
 		this.gameState.inactivePlayers = [];
@@ -269,8 +278,13 @@ class GameController {
 		return false;
 	}
 
-	public setupPlayer(pName: string, pSocketID: string): PlayerModel {
+	public setupPlayer(
+		pName: string,
+		pSocketID: string,
+		pIsAdmin: boolean
+	): PlayerModel {
 		let newPlayer: PlayerModel = null;
+
 		for (let index = 0; index < this.getActivePlayers().length; index++) {
 			let player: PlayerModel = this.getActivePlayers()[index];
 			if (player.playerName.toUpperCase() === pName.toUpperCase()) {
@@ -294,6 +308,7 @@ class GameController {
 			newPlayer.bankScore = 0;
 			newPlayer.playerName = pName;
 			newPlayer.isStartedLastTurn = false;
+			newPlayer.isAdmin = pIsAdmin;
 		}
 
 		newPlayer.currentScore = 0;
@@ -323,7 +338,17 @@ class GameController {
 			});
 		}
 
-		return scores
+		return scores;
+	}
+
+	public findPlayerByID(pID: string): PlayerModel {
+		for (let index = 0; index < this.gameState.players.length; index++) {
+			if (this.gameState.players[index].playerID === pID) {
+				return this.gameState.players[index];
+			}
+		}
+
+		return null;
 	}
 }
 

@@ -8,10 +8,6 @@ export interface ChatSectionProps {
 }
 
 class ChatSection extends React.Component<ChatSectionProps> {
-	constructor(props: ChatSectionProps) {
-		super(props);
-	}
-
 	getMessages = () => {
 		return this.props.messages.map((message, index) => {
 			return (
