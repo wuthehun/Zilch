@@ -1,0 +1,54 @@
+.parent-disable {
+	position: fixed;
+	top: 0;
+	left: 0;
+	background: #000;
+	opacity: 0.4;
+	z-index: 998;
+	height: 100%;
+	width: 100%;
+}
+
+.drawer-body {
+	height: 100%;
+	width: 40vw;
+	position: absolute;
+	top: 0;
+	right: 0;
+	background-color: #ffe15c;
+	z-index: 999;
+	white-space: pre-wrap;
+	max-height: 100%;
+}
+
+.drawer-text {
+	color: #003594;
+	font-size: 20px;
+	font-weight: bold;
+	padding-left: 24px;
+	overflow: auto;
+	overflow-y: scroll;
+	max-height: 85%;
+	margin-bottom: 24px;
+}
+
+.drawer-header {
+	color: #003594;
+	background-color: #ffd100;
+	height: 36px;
+	padding-left: 24px;
+	margin-bottom: 24px;
+	font-size: 24px;
+	font-weight: bold;
+}
+
+[class*="drawer-body"] {
+	width: 80%;
+}
+
+@media only screen and (min-width: 768px) { 
+	.drawer-body {
+		width: 50%;
+
+	}
+}

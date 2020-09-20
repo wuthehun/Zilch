@@ -34,6 +34,10 @@ class GameController {
 			player.bankScore = 0;
 			player.currentScore = 0;
 		}
+
+		if (pIsForceReset) {
+			this.moveToNextPlayer();
+		}
 	}
 
 	public clearGame() {
