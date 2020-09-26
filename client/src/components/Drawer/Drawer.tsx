@@ -1,4 +1,5 @@
 import React from "react";
+import ParentDisabler from "../ParentDisabler/ParentDisabler";
 import "./Drawer.css";
 
 export interface DrawerProps {
@@ -16,7 +17,7 @@ class Drawer extends React.Component<DrawerProps> {
 	render() {
 		return this.props.isShown ? (
 			<>
-				<div className="parent-disable" onClick={this.handleCloseClick}></div>
+				<ParentDisabler onCLick={this.handleCloseClick}></ParentDisabler>
 				<div className="drawer-body">
 					<div className="drawer-header">{this.props.header}</div>
 					<div className="drawer-text">{this.props.textElements}</div>

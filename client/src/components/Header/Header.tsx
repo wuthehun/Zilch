@@ -4,6 +4,7 @@ import "./Header.css";
 export interface HeaderProps {
 	isUserAdmin: boolean;
 	onReset: () => any;
+	onHeaderClick: () => any;
 }
 
 class Header extends React.Component<HeaderProps> {
@@ -21,6 +22,7 @@ class Header extends React.Component<HeaderProps> {
 	render() {
 		return (
 			<div className="header">
+				<div className="menu-button" onClick={this.props.onHeaderClick}>Z</div>
 				<div className="header-text">Zilch</div>
 				<div className={this.getAdminClassName()} onClick={this.props.onReset}>
 					Reset

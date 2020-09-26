@@ -9,14 +9,13 @@
 
 .player-name {
 	font-style: normal;
-	font-weight: normal;
+	font-weight: bold;
 	font-size: 64px;
 	line-height: 75px;
 	display: flex;
 	align-items: center;
 	color: #ffd100;
 	margin-bottom: 24px;
-
 }
 
 .player-score {
@@ -27,25 +26,4 @@
 	align-items: center;
 	color: #ffd100;
 	margin-bottom: 24px;
-}
-
-.rules-button {
-	position: absolute;
-	top: 60px;
-	right: 36px;
-	font-size: 16px;
-	font-weight: bolder;
-	color: #ffd100;
-	cursor: pointer;
-
-	-moz-user-select: none;
-	-khtml-user-select: none;
-	-webkit-user-select: none;
-
-	/*
-		Introduced in Internet Explorer 10.
-		See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
-	*/
-	-ms-user-select: none;
-	user-select: none;
 }

@@ -1,0 +1,52 @@
+.menu-body {
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: #ffd100;
+	z-index: 999;
+	white-space: pre-wrap;
+	max-height: 100%;
+	border-right: 5px solid #ffe15c;
+}
+
+.menu-header {
+	background-color: #003594;
+	color: #ffd100;
+	height: 48px;
+	font-size: 36px;
+	font-weight: bolder;
+	text-align: center;
+	margin-bottom: 24px;
+	border-bottom: 5px solid #ffe15c;
+
+}
+
+.menu-item {
+	font-size: 20px;
+	font-weight: bold;
+	margin-left: 12px;
+	cursor: pointer;
+
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+
+	/*
+		Introduced in Internet Explorer 10.
+		See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+	*/
+	-ms-user-select: none;
+	user-select: none;
+
+}
+
+[class*="menu-body"] {
+	width: 80%;
+}
+
+@media only screen and (min-width: 768px) {
+	.menu-body {
+		width: 30%;
+	}
+}

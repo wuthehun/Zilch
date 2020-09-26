@@ -15,6 +15,27 @@
 	font-weight: bolder;
 }
 
+.menu-button {
+	font-size: 36px;
+	font-weight: bolder;
+	position: absolute;
+	left: 24px;
+	cursor: pointer;
+	color: #003594;
+
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+
+	/*
+		Introduced in Internet Explorer 10.
+		See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+	*/
+	-ms-user-select: none;
+	user-select: none;
+
+}
+
 .reset-button {
 	position: absolute;
 	right: 0;

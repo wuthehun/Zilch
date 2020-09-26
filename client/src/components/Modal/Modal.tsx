@@ -1,4 +1,5 @@
 import React from "react";
+import ParentDisabler from "../ParentDisabler/ParentDisabler";
 import "./Modal.css";
 
 export interface ModalProps {
@@ -55,7 +56,7 @@ class Modal extends React.Component<ModalProps, ModalState> {
 	render() {
 		return this.props.isShown ? (
 			<>
-				<div className="parent-disable" onClick={this.handleCancelClick}></div>
+				<ParentDisabler onCLick={this.handleCancelClick}></ParentDisabler>
 				<div className="modal-body">
 					<div className="modal-text">{this.props.text}</div>
 					{this.props.isShowInput && (

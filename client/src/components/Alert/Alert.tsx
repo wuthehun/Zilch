@@ -1,4 +1,5 @@
 import React from "react";
+import ParentDisabler from "../ParentDisabler/ParentDisabler";
 import "./Alert.css";
 
 export interface AlertProps {
@@ -25,7 +26,7 @@ class Alert extends React.Component<AlertProps> {
 	render() {
 		return this.props.isShown ? (
 			<>
-				<div className="parent-disable" onClick={this.handleCloseClick}></div>
+				<ParentDisabler onCLick={this.handleCloseClick}></ParentDisabler>
 				<div className="alert-body">
 					<div className="alert-text">{this.props.text}</div>
 				</div>
