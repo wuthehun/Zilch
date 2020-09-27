@@ -4,14 +4,14 @@
 	position: absolute;
 	top: 0;
 	right: 0;
-	background-color: #ffe15c;
+	background-color: var(--secondary-color-alt);
 	z-index: 999;
 	white-space: pre-wrap;
 	max-height: 100%;
 }
 
 .drawer-text {
-	color: #003594;
+	color: var(--primary-color);
 	font-size: 20px;
 	font-weight: bold;
 	padding-left: 24px;
@@ -22,8 +22,8 @@
 }
 
 .drawer-header {
-	color: #003594;
-	background-color: #ffd100;
+	color: var(--primary-color);
+	background-color: var(--secondary-color);
 	height: 36px;
 	padding-left: 24px;
 	margin-bottom: 24px;

@@ -27,6 +27,7 @@ export interface MainState {
 	isAdmin: boolean;
 	isShowGameRules: boolean;
 	isShowMenu: boolean;
+	themeName: string;
 }
 
 let socket: SocketIOClient.Socket;
@@ -49,6 +50,7 @@ class Main extends React.Component<any, MainState> {
 			isAdmin: false,
 			isShowGameRules: false,
 			isShowMenu: false,
+			themeName: "rams",
 		};
 
 		socket = io();
@@ -318,12 +320,39 @@ class Main extends React.Component<any, MainState> {
 			menuName: "Rules",
 			menuOnClick: this.handleRulesOnClick,
 		});
+		menuItems.push({
+			menuName: "Rams Theme",
+			menuOnClick: this.setRamsTheme,
+		});
+		menuItems.push({
+			menuName: "49ers Theme",
+			menuOnClick: this.setNinersTheme,
+		});
+
 		return menuItems;
+	};
+
+	setRamsTheme = () => {
+		this.setState({
+			themeName: "rams",
+		});
+	};
+
+	setNinersTheme = () => {
+		this.setState({
+			themeName: "niners",
+		});
+	};
+
+	getMainClassName = (): string => {
+		let mainClass: string = "main main-body-theme-" + this.state.themeName;
+
+		return mainClass;
 	};
 
 	render() {
 		return (
-			<div className="main">
+			<div className={this.getMainClassName()}>
 				<Header
 					isUserAdmin={this.state.isAdmin}
 					onReset={this.handleOnReset}

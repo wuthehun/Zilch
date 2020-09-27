@@ -1,13 +1,13 @@
 .alert-body {
 	position: absolute;
 	width: 100%;
-	background-color: #ffe15c;
+	background-color: var(--secondary-color-alt);
 	top: 25%;
 	left: 0px;
 	padding-top:24px;
 	padding-bottom:24px;
 	z-index: 999;
-	border-bottom: 10px solid #ffd100;
+	border-bottom: 10px solid var(--secondary-color);
 
 }
 
@@ -18,5 +18,5 @@
 	font-size: 64px;
 	text-align: center;
 	font-weight: bolder;
-	color: #1c3144;
+	color: var(--tirciary-color);
 }

@@ -4,21 +4,21 @@
 	overflow: auto;
 	overflow-y: scroll;
 	border-width: 1px;
-	border-color: #1C3144;
+	border-color: var(--tirciary-color);
 	border:outset;
-	background-color: #FFE15C;
+	background-color: var(--secondary-color-alt);
 	margin-right: 36px;
 	margin-bottom: 24px;
 }
 
 .message {
-	background-color: #FFD100;
+	background-color: var(--secondary-color);
 	padding: 5px;
 	white-space: pre-wrap;
 }
 
 .message:nth-child(2n) {
-	background-color: #FFE15C;
+	background-color: var(--secondary-color-alt);
 	white-space: pre-wrap;
 }
 
@@ -34,9 +34,9 @@
 	overflow: auto;
 	overflow-y: scroll;
 	border-width: 1px;
-	border-color: #1C3144;
+	border-color: var(--tirciary-color);
 	border:outset;
-	background-color: #FFE15C;
+	background-color: var(--secondary-color-alt);
 	margin-right: 36px;
 	margin-bottom: 24px;
 }

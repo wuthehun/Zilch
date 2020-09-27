@@ -11,8 +11,8 @@
 .dice-button {
 	width: 168px;
 	height: 50px;
-	background: #ffd100;
-	border: 1px solid #1c3144;
+	background: var(--secondary-color);
+	border: 1px solid var(--tirciary-color);
 	box-sizing: border-box;
 	border-radius: 10px;
 	margin-right: 24px;
@@ -21,7 +21,7 @@
 	text-align: center;
 	font-size: 36px;
 	font-weight: bolder;
-	color: #1c3144;
+	color: var(--tirciary-color);
 	-moz-user-select: none;
 	-khtml-user-select: none;
 	-webkit-user-select: none;

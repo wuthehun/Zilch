@@ -1,7 +1,7 @@
 .modal-body {
 	position: absolute;
-	background-color: #ffe15c;
-	border: 1px solid #1c3144;
+	background-color: var(--secondary-color-alt);
+	border: 1px solid var(--tirciary-color);
 	box-sizing: border-box;
 	border-radius: 10px;
 	top: 25%;
@@ -46,8 +46,8 @@
 .modal-buttons div {
 	width:70px;
 	margin-left: 12px;
-	background: #ffd100;
-	border: 1px solid #1c3144;
+	background: var(--secondary-color);
+	border: 1px solid var(--tirciary-color);
 	box-sizing: border-box;
 	border-radius: 5px;
 	cursor: pointer;
@@ -55,7 +55,7 @@
 	text-align: center;
 	font-size: 16px;
 	font-weight: bolder;
-	color: #1c3144;
+	color: var(--tirciary-color);
 }
 
 [class*="modal-body"] {

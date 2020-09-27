@@ -4,10 +4,10 @@
 	display: flex;
 	justify-content: center;
 	margin-bottom: 24px;
-	background-color: #ffd100;
-	color: #003594;
+	background-color: var(--secondary-color);
+	color: var(--primary-color);
 	height: 48px;
-	border-bottom: 5px solid #ffe15c;
+	border-bottom: 5px solid var(--secondary-color-alt);
 }
 
 .header-text {
@@ -21,7 +21,7 @@
 	position: absolute;
 	left: 24px;
 	cursor: pointer;
-	color: #003594;
+	color: var(--primary-color);
 
 	-moz-user-select: none;
 	-khtml-user-select: none;
@@ -41,7 +41,7 @@
 	right: 0;
 	font-size: 36px;
 	font-weight: bolder;
-	color: #ffe15c;
+	color: var(--secondary-color-alt);
 	cursor: pointer;
 
 	-moz-user-select: none;
