@@ -96,6 +96,10 @@ class GameController {
 			return;
 		}
 
+		if (this.getCurrentPlayer() == null) {
+			return;
+		}
+
 		const prevPlayer: PlayerModel = this.getCurrentPlayer();
 		prevPlayer.currentScore = 0;
 
@@ -171,11 +175,16 @@ class GameController {
 		return zEngine.getPossibleScoreCombos(poTurn);
 	}
 
+	public getBestScores(poTurn: TurnModel): ScoreModel[] {
+		const zEngine: ZilchEngine = new ZilchEngine();
+		return zEngine.getBestScoreValues(poTurn);
+	}
+
 	protected addCurrentTurn(poPlayer: PlayerModel) {
 		let currScore: number = 0;
 		const zEngine: ZilchEngine = new ZilchEngine();
 		currScore = zEngine.getBestScore(poPlayer.currTurn);
-		if (currScore === 0) {
+		if (currScore === 0 && !this.gameState.isManualMode) {
 			throw new Error("Must lock a score value");
 		}
 		poPlayer.currentScore = poPlayer.currentScore + currScore;
@@ -331,6 +340,16 @@ class GameController {
 		}
 	}
 
+	public applyManualRoll(pManualDice: { value: number; isChecked: boolean }[], pTurn: TurnModel) {
+		for (let index = 0; index < 6; index++) {
+			if (pManualDice[index].isChecked) {
+				pTurn.dices[index].isLocked = true;
+			}
+
+			pTurn.dices[index].value = pManualDice[index].value;
+		}
+	}
+
 	public getPlayerScores(): PlayerScoreModel[] {
 		let scores: PlayerScoreModel[] = [];
 
@@ -354,6 +373,22 @@ class GameController {
 
 		return null;
 	}
+
+	public setManualMode(pIsManual: boolean) {
+		if (this.gameState == undefined || this.gameState == null) {
+			return;
+		}
+		this.gameState.isManualMode = pIsManual;
+	}
+
+	public getManualMode(): boolean {
+		if (this.gameState == undefined || this.gameState == null) {
+			return false;
+		}
+
+		return this.gameState.isManualMode;
+	}
+
 }
 
 export default GameController;

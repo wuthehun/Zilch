@@ -1,3 +1,10 @@
+.dice-main {
+	margin-right: 24px;
+	margin-bottom: 24px;
+	align-items: center;
+	text-align: center;
+}
+
 .dice {
 	background: var(--secondary-color);
 	border: 1px solid var(--tirciary-color);
@@ -5,9 +12,7 @@
 	border-radius: 10px;
 	width: 100px;
 	height: 100px;
-	margin-right: 24px;
 	cursor: pointer;
-	margin-bottom: 24px;
 
 	-moz-user-select: none;
 	-khtml-user-select: none;
@@ -19,7 +24,6 @@
 	*/
 	-ms-user-select: none;
 	user-select: none;
-
 }
 
 .value-text {
@@ -52,4 +56,31 @@
 
 .locked-cursor {
 	cursor: default;
+}
+
+.plus {
+	cursor: pointer;
+	color: var(--secondary-color);
+	font-size: 24px;
+	font-weight: bolder;
+	width: 100%;
+	text-align: center;
+	height: 50px;
+	
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+
+	/*
+		Introduced in Internet Explorer 10.
+		See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+	*/
+	-ms-user-select: none;
+	user-select: none;
+
+}
+
+.locked-plus {
+	color: var(--secondary-color-alt);
+
 }

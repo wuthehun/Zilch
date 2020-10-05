@@ -59,8 +59,6 @@ io.on("connection", (socket) => {
 			isAdmin = true;
 		}
 
-		console.log(socket.id + " " + game.getNumPlayers());
-
 		let player: PlayerModel = null;
 		try {
 			player = game.setupPlayer(playerName, socket.id, isAdmin);
@@ -71,7 +69,6 @@ io.on("connection", (socket) => {
 			});
 			return;
 		}
-		console.log(socket.id + " " + game.getNumPlayers());
 
 		users[socket.id] = playerName;
 		socket.broadcast.emit("user-connected", playerName);
@@ -80,6 +77,7 @@ io.on("connection", (socket) => {
 			message: "You joined",
 			score: player.bankScore,
 			isAdmin: isAdmin,
+			isManualMode: game.getManualMode(),
 		});
 
 		updateTurnSingle(socket);
@@ -151,6 +149,30 @@ io.on("connection", (socket) => {
 		}
 	});
 
+	socket.on(
+		"roll-manual",
+		(manualDice: { value: number; isChecked: boolean }[]) => {
+			let player: PlayerModel = game.getCurrentPlayer();
+			if (player.playerID !== socket.id) {
+				socket.emit("chat-message", {
+					message: "Not your turn",
+					name: "SYSTEM",
+				});
+				return;
+			}
+
+			if (game.isGameOver()) {
+				socket.emit("chat-message", {
+					message: "Game is over",
+					name: "SYSTEM",
+				});
+				return;
+			}
+
+			handleRollManual(socket, manualDice);
+		}
+	);
+
 	socket.on("bank", (dataIsLocked: boolean[]) => {
 		let player: PlayerModel = game.getCurrentPlayer();
 		if (player.playerID !== socket.id) {
@@ -200,16 +222,76 @@ io.on("connection", (socket) => {
 
 		handleTurnChange(socket);
 	});
+	
+	socket.on("bank-manual", (manualDice: { value: number; isChecked: boolean }[]) => {
+		let player: PlayerModel = game.getCurrentPlayer();
+		if (player.playerID !== socket.id) {
+			socket.emit("chat-message", {
+				message: "Not your turn",
+				name: "SYSTEM",
+			});
+			return;
+		}
+
+		if (game.isGameOver()) {
+			socket.emit("chat-message", {
+				message: "Game is over",
+				name: "SYSTEM",
+			});
+			return;
+		}
+
+		game.applyManualRoll(manualDice, player.currTurn);
+		let scores:ScoreModel[] = game.getBestScores(player.currTurn);
+
+		try {
+			game.processTurn(player, true);
+		} catch (e) {
+			socket.emit("chat-message", {
+				message: e.message,
+				name: "SYSTEM",
+			});
+			return;
+		}
+
+		let message: string = player.playerName + " bank\n";
+		message = message + "Manual Roll: ";
+		for (let dice of player.currTurn.dices) {
+			message = message + dice.value.toString() + " ";
+		}
+		message = message + "\nBest Scores: \n";
+
+		for (let score of scores) {
+			message =
+				message + " - " + score.scoreType + " " + score.value.toString() + "\n";
+		}
+	
+		socket.broadcast.emit("chat-message", {
+			message: message,
+			name: users[socket.id],
+			playerScores: game.getPlayerScores(),
+		});
+
+		socket.emit("roll-message", {
+			message: message,
+			name: users[socket.id],
+			roll: player.currTurn,
+			score: player.currentScore,
+			bankScore: player.bankScore,
+			isReset: true,
+			playerScores: game.getPlayerScores(),
+		});
+
+		handleTurnChange(socket);
+	});
 
 	socket.on("reset", () => {
 		let player: PlayerModel = game.findPlayerByID(socket.id);
 		if (player) {
 			game.resetGame(player.isAdmin);
-		}
-		else {
+		} else {
 			game.resetGame(false);
 		}
-
 
 		updateTurnAll(socket);
 	});
@@ -226,6 +308,15 @@ io.on("connection", (socket) => {
 			message: scores,
 			name: "SCORES",
 		});
+	});
+
+	socket.on("toggle-manual-mode", () => {
+		let player: PlayerModel = game.findPlayerByID(socket.id);
+		if (player && player.isAdmin) {
+			let isManual: boolean = game.getManualMode();
+			game.setManualMode(!isManual);
+			updateManualMode(socket, game.getManualMode());
+		}
 	});
 });
 
@@ -361,4 +452,88 @@ function handleRollDice(socket, pPlayer: PlayerModel, pIsReroll: boolean) {
 		});
 		handleTurnChange(socket);
 	}
+}
+
+function handleRollManual(socket, manualDice: { value: number; isChecked: boolean }[]) {
+	let player: PlayerModel = game.getCurrentPlayer();
+
+	game.applyManualRoll(manualDice, player.currTurn);
+	let scores:ScoreModel[] = game.getBestScores(player.currTurn);
+
+	try {
+		game.processTurn(player, false);
+	} catch (e) {
+		socket.emit("chat-message", {
+			message: e.message,
+			name: "SYSTEM",
+		});
+		return;
+	}
+
+	// if all dice are used, reset roll
+	// begin again
+	if (game.areAllDiceUsed(player.currTurn)) {
+		game.resetAfterUsedAllDice(player.currTurn);
+
+		// send reset message to client
+		socket.broadcast.emit("chat-message", {
+			message: "All dice used!  Continuing roll",
+			name: users[socket.id],
+		});
+
+		socket.emit("roll-reset", {
+			message: "All dice used!  Resetting locks and continuing roll",
+			name: "You",
+		});
+	}
+
+	let message: string = "Manual Roll: ";
+	for (let dice of player.currTurn.dices) {
+		message = message + dice.value.toString() + " ";
+	}
+
+	message = message + "\nBest Scores: \n";
+
+	for (let score of scores) {
+		message =
+			message + " - " + score.scoreType + " " + score.value.toString() + "\n";
+	}
+
+	socket.broadcast.emit("chat-message", {
+		message: message,
+		name: users[socket.id],
+		playerScores: game.getPlayerScores(),
+	});
+
+	socket.emit("roll-message", {
+		message: message,
+		name: users[socket.id],
+		roll: player.currTurn,
+		score: player.currentScore,
+		bankScore: player.bankScore,
+		playerScores: game.getPlayerScores(),
+	});
+
+	if (scores.length === 0) {
+		player.currTurn = game.getNewTurn();
+		socket.broadcast.emit("chat-message", {
+			message: "ZILCH! Next Player Turn!",
+			name: users[socket.id],
+		});
+
+		socket.emit("zilch-message", {
+			message: "ZILCH! Next Player Turn!",
+			name: "You",
+		});
+		handleTurnChange(socket);
+	}
+
+}
+
+function updateManualMode(socket, pIsManual: boolean) {
+	socket.broadcast.emit("update-manual", {
+		data: pIsManual,
+	});
+
+	socket.emit("update-manual", pIsManual);
 }

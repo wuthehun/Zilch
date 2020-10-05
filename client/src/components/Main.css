@@ -1,6 +1,7 @@
 .main {
 	background: var(--primary-color);
-	height: 100%;
+	height: auto;
+	min-height: 100%;
 }
 .body {
 	margin-left: 36px;

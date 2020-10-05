@@ -69,6 +69,18 @@ class ZilchEngine {
 	}
 
 	public getBestScore(poTurn: TurnModel): number {
+		let scores: ScoreModel[] = this.getBestScoreValues(poTurn);
+		let totalScore: number = 0;
+		for (let score of scores) {
+			totalScore = totalScore + score.value;
+		}
+
+		return totalScore;
+
+	}
+
+	public getBestScoreValues(poTurn: TurnModel): ScoreModel[] {
+
 		let arrDice: number[] = this.prepActualScore(poTurn);
 		let availDice: number = 0;
 
@@ -101,12 +113,7 @@ class ZilchEngine {
 			}
 		}
 
-		let totalScore: number = 0;
-		for (let score of result) {
-			totalScore = totalScore + score.value;
-		}
-
-		return totalScore;
+		return result;
 	}
 
 	public getPossibleScoreCombos(poTurn: TurnModel): ScoreModel[] {

@@ -6,6 +6,7 @@ class GameStateModel {
 	public isLastRound: boolean;
 	public lastRoundPlayerID: string;
 	public isGameOver: boolean;
+	public isManualMode: boolean;
 
 }
 

@@ -28,6 +28,7 @@ export interface MainState {
 	isShowGameRules: boolean;
 	isShowMenu: boolean;
 	themeName: string;
+	isManual: boolean;
 }
 
 let socket: SocketIOClient.Socket;
@@ -51,6 +52,7 @@ class Main extends React.Component<any, MainState> {
 			isShowGameRules: false,
 			isShowMenu: false,
 			themeName: "rams",
+			isManual: false,
 		};
 
 		socket = io();
@@ -66,6 +68,7 @@ class Main extends React.Component<any, MainState> {
 		socket.on("player-wins", this.handlePlayerWin);
 		socket.on("you-win", this.handleYouWin);
 		socket.on("roll-reset", this.handleRollReset);
+		socket.on("update-manual", this.handleManualMode);
 	}
 
 	getResetDice = (): DiceModel[] => {
@@ -78,6 +81,8 @@ class Main extends React.Component<any, MainState> {
 			{ value: 0, isLocked: false, isChecked: false },
 		];
 	};
+
+	// start socket message handlers
 
 	handleConnected = (data: {
 		name: string;
@@ -178,6 +183,18 @@ class Main extends React.Component<any, MainState> {
 		});
 	};
 
+	handleManualMode = (isManual: boolean) => {
+		this.addChatMessage({
+			name: "SYSTEM",
+			message: "Manual Mode: " + (isManual ? "ON" : "OFF"),
+		});
+		this.setState({
+			isManual: isManual,
+		});
+	};
+
+	// end socket message handlers
+
 	addChatMessage = (data: {
 		name: string;
 		message: string;
@@ -253,7 +270,7 @@ class Main extends React.Component<any, MainState> {
 		if (isReroll && !hasLocked) {
 			this.addChatMessage({
 				name: "SYSTEM",
-				message: "you much lock one number",
+				message: "you must lock one number",
 			});
 			return;
 		}
@@ -261,14 +278,58 @@ class Main extends React.Component<any, MainState> {
 		socket.emit("roll", dataIsLocked);
 	};
 
-	handleOnBank = () => {
-		let dataIsLocked = [];
+	handleOnSendRoll = () => {
+		let dices = [];
+		let hasLocked = false;
 
+		let isReroll = false;
 		for (let index = 0; index < 6; index++) {
-			dataIsLocked.push(this.state.dices[index].isChecked);
+			if (this.state.dices[index].isChecked) {
+				hasLocked = true;
+			}
+
+			if (this.state.dices[index].value !== 0) {
+				isReroll = true;
+			}
+
+			dices.push({
+				value: this.state.dices[index].value,
+				isChecked: this.state.dices[index].isChecked,
+			});
 		}
 
-		socket.emit("bank", dataIsLocked);
+		socket.emit("roll-manual", dices);
+	};
+
+	handleOnDiceValueChange = (value: number, index: number) => {
+		let currDices: DiceModel[] = this.state.dices;
+		currDices[index].value = value;
+
+		this.setState({
+			dices: currDices,
+		});
+	};
+
+	handleOnBank = () => {
+		if (this.state.isManual) {
+			let dices = [];
+
+			for (let index = 0; index < 6; index++) {
+				dices.push({
+					value: this.state.dices[index].value,
+					isChecked: this.state.dices[index].isChecked,
+				});
+			}
+			socket.emit("bank-manual", dices);
+		} else {
+			let dataIsLocked = [];
+
+			for (let index = 0; index < 6; index++) {
+				dataIsLocked.push(this.state.dices[index].isChecked);
+			}
+
+			socket.emit("bank", dataIsLocked);
+		}
 	};
 
 	handleOnDiceChecked = (isChecked: boolean, index: number) => {
@@ -328,6 +389,12 @@ class Main extends React.Component<any, MainState> {
 			menuName: "49ers Theme",
 			menuOnClick: this.setNinersTheme,
 		});
+		if (this.state.isAdmin) {
+			menuItems.push({
+				menuName: this.state.isManual ? "Set Normal Game" : "Set Manual Game",
+				menuOnClick: this.toggleManualFlag,
+			});
+		}
 
 		return menuItems;
 	};
@@ -342,6 +409,10 @@ class Main extends React.Component<any, MainState> {
 		this.setState({
 			themeName: "niners",
 		});
+	};
+
+	toggleManualFlag = () => {
+		socket.emit("toggle-manual-mode");
 	};
 
 	getMainClassName = (): string => {
@@ -382,6 +453,9 @@ class Main extends React.Component<any, MainState> {
 						onRoll={this.handleOnRoll}
 						onBank={this.handleOnBank}
 						onDiceChecked={this.handleOnDiceChecked}
+						onSendRoll={this.handleOnSendRoll}
+						onDiceValueChange={this.handleOnDiceValueChange}
+						isManual={this.state.isManual}
 					></DiceSection>
 					<ChatSection
 						messages={this.state.messages}
